@@ -77,13 +77,12 @@ const Sidebar = () => {
     }, 300);
 
 
-
-    const handleUserClick = (user) => {
-        // Logic to open chat with this user or view their profile
-        console.log(`Opening chat with ${user.name}`);
-        setShowSearch(false);
-        setSearchResult([]);
-    };
+        const handleUserClick = (user) => {
+            console.log(`Opening chat with ${user.name}`);
+            setShowSearch(false);
+            setSearchResult([]);
+            navigate(`${user._id}`); // Navigate to the chat route
+        };
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -112,7 +111,7 @@ const Sidebar = () => {
         try {
             const response = await axios.get(allUsersUrl);
             if (response.data.success) {
-
+                  console.log(response.data.data)
                 response.data.data.sort((a, b) => {
                     const nameA = a.name.toLowerCase();
                     const nameB = b.name.toLowerCase();
@@ -125,7 +124,7 @@ const Sidebar = () => {
                     return 0;
                 });
 
-                
+
                 setAllUsers(response.data.data);
             } else {
                 console.error("Error fetching users:", response.data.message);
@@ -139,26 +138,21 @@ const Sidebar = () => {
         <div className='w-full h-full grid grid-cols-[48px,1fr] bg-white'>
             <div className='bg-slate-200 w-12 h-full rounded-tr-lg rounded-br-lg py-5 flex flex-col justify-between'>
                 <div>
-                    <NavLink
-                        to="/chat"
-                        className={({ isActive }) => `w-12 h-12 bg-slate-300 flex justify-center items-center rounded-tr-lg cursor-pointer transition-colors duration-300 ease-in-out transform hover:bg-slate-400 ${isActive ? "bg-slate-400" : ""}`}
+                    <button
+                        className={`w-12 h-12 bg-slate-300 flex justify-center items-center rounded-tr-lg cursor-pointer transition-colors duration-300 ease-in-out transform hover:bg-slate-400 ${isConversation ? "bg-slate-400" : ""}`}
                         title='Chat'
                         onClick={handleConversationChats}
                     >
                         <CiChat1 size={38} />
-                    </NavLink>
+                    </button>
 
-
-                    <NavLink
-                        to="/friends"
-                        className={({ isActive }) => `w-12 h-12 bg-slate-300 flex justify-center items-center cursor-pointer transition-colors duration-300 ease-in-out transform hover:bg-slate-400 ${isActive ? "bg-slate-400" : ""}`} onClick={handleConversationFriends}
+                    <button
+                        className={`w-12 h-12 bg-slate-300 flex justify-center items-center cursor-pointer transition-colors duration-300 ease-in-out transform hover:bg-slate-400 ${!isConversation ? "bg-slate-400" : ""}`}
+                        onClick={handleConversationFriends}
                         title='Friends'
                     >
                         <CiUser size={32} />
-                    </NavLink>
-
-
-
+                    </button>
                 </div>
                 <div>
                     <button
@@ -168,6 +162,7 @@ const Sidebar = () => {
                     >
                         <Avatar
                             size={30}
+                            userId={user?._id}
                             name={user.name || "User"}
                             profile_pic={user.profile_pic}
                         />
@@ -208,23 +203,22 @@ const Sidebar = () => {
                                 <div className="p-4 text-gray-500">No results found</div>
                             ) : (
                                     searchResult.map(user => (
-                                        <Link to={"/"+user?.name}>
-                                    <div
-                                        key={user.id}
-                                        className="p-3 hover:bg-slate-100 cursor-pointer"
-                                        onClick={() => handleUserClick(user)}
                                         
-                                    >
-                                        <div className="flex items-center space-x-3">
-                                            <Avatar size={20} name={user.name} profile_pic={user.profile_pic} />
-                                            <div>
-                                                <h3 className="font-semibold">{user.name}</h3>
-                                                <p className="text-xs text-gray-500">{user.status}</p>
+                                        <div
+                                            key={user._id}
+                                            className="p-3 hover:bg-slate-100 cursor-pointer"
+                                            onClick={() => handleUserClick(user)}
+                                        >
+                                            <div className="flex items-center space-x-3">
+                                                <Avatar userId={user?._id} size={20} name={user.name} profile_pic={user.profile_pic} />
+                                                <div>
+                                                    <h3 className="font-semibold">{user.name}</h3>
+                                                    <p className="text-xs text-gray-500">{user.status}</p>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                        </Link>
-                                ))
+                                    
+                                    ))
                             )}
                         </div>
                     )}
@@ -243,12 +237,12 @@ const Sidebar = () => {
                     ) : (
                         recent.map(user => (
                             <div
-                                key={user.id}
+                                key={user._id}
                                 className="p-4 hover:bg-slate-200 transition-colors duration-300 cursor-pointer"
                                 onClick={() => handleUserClick(user)}
                             >
                                 <div className="flex items-center space-x-4">
-                                    <Avatar size={40} name={user.name} profile_pic={user.profile_pic} />
+                                    <Avatar size={40} userId={user?._id} name={user.name} profile_pic={user.profile_pic} />
                                     <div>
                                         <h3 className="font-semibold">{user.name}</h3>
                                         <p className="text-sm text-gray-500">{user.status || "Hey there! I'm using this chat app."}</p>
@@ -264,12 +258,12 @@ const Sidebar = () => {
                         ) : (
                             allUsers.map(user => (
                                 <div
-                                    key={user.id}
+                                    key={user._id}
                                     className="p-4 hover:bg-slate-200 transition-colors duration-300 cursor-pointer"
-                                    onClick={() => handleUserClick(user)}
+                                    onClick={ ()=>handleUserClick(user)}
                                 >
                                     <div className="flex items-center space-x-4">
-                                        <Avatar size={40} name={user.name} profile_pic={user.profile_pic} />
+                                        <Avatar size={40} userId={user?._id} name={user.name} profile_pic={user.profile_pic} />
                                         <div>
                                             <h3 className="font-semibold">{user.name}</h3>
                                             <p className="text-sm text-gray-500">{user.status || "Hey there! I'm using this chat app."}</p>

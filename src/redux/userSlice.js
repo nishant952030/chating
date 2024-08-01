@@ -5,7 +5,9 @@ const initialState = {
     name: "",
     email: "",
     profile_pic: "",
-    token: null  // Change this to null instead of ""
+    token: null,
+    onlineUser: [],
+    socketConnection: null
 };
 
 export const userSlice = createSlice({
@@ -22,9 +24,15 @@ export const userSlice = createSlice({
             state.token = action.payload.token;
         },
         
-        logout: () => initialState  // Use initialState to reset everything
+        logout: () => initialState,
+        setOnlineUser: (state, action) => {
+            state.onlineUser=action.payload
+        },
+        setSocketConnection: (state, action)=>{
+            state.socketConnection=action.payload
+        }
     }
 });
 
-export const { setUser, setToken, logout } = userSlice.actions;
+export const { setUser, setToken, logout ,setOnlineUser,setSocketConnection} = userSlice.actions;
 export default userSlice.reducer;
